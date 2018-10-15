@@ -1,0 +1,648 @@
+from IPython.display import display
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+import os
+os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'
+
+import graphviz
+
+import warnings
+warnings.filterwarnings(action='ignore')
+
+##########################################################
+
+###1.데이터 수집&확인
+house=pd.read_csv('C:/train.csv')
+house.describe() 
+
+##########################################################
+print(house.shape) 
+print(house.dtypes) 
+
+##########################################################
+#null값 확인
+
+print(sum(null.values != 0)) # null값은 19개 
+print()
+
+null = house.isnull().sum().to_frame().sort_values(0,ascending=False)
+null
+
+##########################################################
+#null값이 1000개 이상인 변수:Alley,PoolQC,Fence,MiscFeature
+house=house.drop(['Alley','PoolQC','Fence','MiscFeature'],axis=1)
+print(house.head()) 
+print(house.isnull().sum()) 
+
+##########################################################
+#null존재 변수
+###null존재하는 변수들만 보여주려면?
+#81개 중 19개:LotFrontage,Alley,MasVnrType,MasVnrArea,BsmtQual,BsmtCond,BsmtExposure,BsmtFinType1,BsmtFinType2,
+          #Electrical,FireplaceQu,GarageType,GarageYrBlt,GarageFinish,GarageQual,GarageCond,PoolQC,Fence,MiscFeature
+#null값이 1000개 이상인 변수:Alley,PoolQC,Fence,MiscFeature
+
+print("old : {}".format(len(house)))
+    
+house=house[-(house['LotFrontage'].isnull())& 
+            -(house['MasVnrType'].isnull())&
+            -(house['MasVnrArea'].isnull())&
+            -(house['BsmtQual'].isnull())&
+            -(house['BsmtCond'].isnull())&
+            -(house['BsmtExposure'].isnull())&
+            -(house['BsmtFinType1'].isnull())& 
+            -(house['BsmtFinType2'].isnull())&
+            -(house['Electrical'].isnull())& 
+            -(house['FireplaceQu'].isnull())&
+            -(house['GarageType'].isnull())&
+            -(house['GarageYrBlt'].isnull())&
+            -(house['GarageFinish'].isnull())& 
+            -(house['GarageQual'].isnull())&
+            -(house['GarageCond'].isnull())]
+
+print("new : {}".format(len(house)))
+    
+##########################################################
+#dtypes csv저장
+dtypes=house.dtypes
+print(dtypes)
+dtypes.to_csv("C:/house_dtypes.csv") 
+    
+##########################################################
+
+#dtypes=number 변수(int,float)
+###null존재하는 변수들만 보여주려면?
+#int(77개 중 33개):MSSubClass,LotArea,OverallQual,OverallCond,YearBuilt,YearRemodAdd,BsmtFinSF1,BsmtFinSF2,BsmtUnfSF
+               #TotalBsmtSF,1stFlrSF,2ndFlrSF,LowQualFinSF,GrLivArea,BsmtFullBath,BsmtHalfBath,FullBath,HalfBath
+               #BedroomAbvGr,KitchenAbvGr,TotRmsAbvGrd,Fireplaces,GarageCars,GarageArea,WoodDeckSF,OpenPorchSF
+               #EnclosedPorch,3SsnPorch,ScreenPorch,PoolArea,MiscVal,MoSold,YrSold
+#float(77개 중 3개):LotFrontage,MasVnrArea,GarageYrBlt
+
+#plotly 이용한 시각화
+
+import plotly.plotly as py
+from plotly.offline import init_notebook_mode, iplot
+init_notebook_mode(connected=True)
+import plotly.graph_objs as go
+
+import matplotlib.pyplot as plt
+
+# Create boxplot1 
+#MSSubClass,LotArea,OverallQual,OverallCond,YearBuilt,YearRemodAdd,BsmtFinSF1,BsmtFinSF2,BsmtUnfSF사용
+trace1 = go.Box(
+                y = house.MSSubClass,
+                name = 'MSSubClass',
+                marker = dict(color = 'rgba(255,174,255,0.5)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace2 = go.Box(
+                y = house.LotArea,
+                name = 'LotArea',
+                marker = dict(color = 'rgba(12,50,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace3 = go.Box(
+                y = house.OverallQual,
+                name = 'OverallQual',
+                marker = dict(color = 'rgba(255,50,156,0.4)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace4 = go.Box(
+                y = house.OverallCond,
+                name = 'OverallCond',
+                marker = dict(color = 'rgba(230,80,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace5 = go.Box(
+                y = house.YearBuilt,
+                name = 'YearBuilt',
+                marker = dict(color = 'rgba(110,10,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace6 = go.Box(
+                y = house.YearRemodAdd,
+                name = 'YearRemodAdd',
+                marker = dict(color = 'rgba(110,10,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace7 = go.Box(
+                y = house.BsmtFinSF1,
+                name = 'BsmtFinSF1',
+                marker = dict(color = 'rgba(110,10,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace8 = go.Box(
+                y = house.BsmtFinSF2,
+                name = 'BsmtFinSF2',
+                marker = dict(color = 'rgba(110,10,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace9 = go.Box(
+                y = house.BsmtUnfSF,
+                name = 'BsmtUnfSF',
+                marker = dict(color = 'rgba(110,10,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+data = [trace1,trace2,trace3, trace4,trace5,trace6,trace7,trace8,trace9]
+iplot(data) 
+
+##########################################################
+
+# Create boxplot2
+#TotalBsmtSF,1stFlrSF,2ndFlrSF,LowQualFinSF,GrLivArea,BsmtFullBath,BsmtHalfBath,FullBath,HalfBath사용
+trace11 = go.Box(
+                y = house.TotalBsmtSF,
+                name = 'TotalBsmtSF',
+                marker = dict(color = 'rgba(255,174,255,0.5)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+#trace12 = go.Box(
+#                y = house.1stFlrSF,
+#                name = '1stFlrSF',
+#                marker = dict(color = 'rgba(12,50,196,0.6)',
+#                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+#                text = house.SalePrice)
+
+#trace13 = go.Box(
+#                y = house.2ndFlrSF,
+#                name = '2ndFlrSF',
+#                marker = dict(color = 'rgba(255,50,156,0.4)',
+#                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+#                text = house.SalePrice)
+
+trace14 = go.Box(
+                y = house.LowQualFinSF,
+                name = 'LowQualFinSF',
+                marker = dict(color = 'rgba(230,80,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace15 = go.Box(
+                y = house.GrLivArea,
+                name = 'GrLivArea',
+                marker = dict(color = 'rgba(110,10,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace16 = go.Box(
+                y = house.BsmtFullBath,
+                name = 'BsmtFullBath',
+                marker = dict(color = 'rgba(110,10,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace17 = go.Box(
+                y = house.BsmtHalfBath,
+                name = 'BsmtHalfBath',
+                marker = dict(color = 'rgba(110,10,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace18 = go.Box(
+                y = house.FullBath,
+                name = 'FullBath',
+                marker = dict(color = 'rgba(110,10,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace19 = go.Box(
+                y = house.HalfBath,
+                name = 'HalfBath',
+                marker = dict(color = 'rgba(110,10,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+data2 = [trace11,trace14,trace15,trace16,trace17,trace18,trace19]
+iplot(data2)  
+
+##########################################################
+# Create boxplot3
+#BedroomAbvGr,KitchenAbvGr,TotRmsAbvGrd,Fireplaces,GarageCars,GarageArea,WoodDeckSF,OpenPorchSF사용
+trace1 = go.Box(
+                y = house.BedroomAbvGr,
+                name = 'BedroomAbvGr',
+                marker = dict(color = 'rgba(255,174,255,0.5)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace2 = go.Box(
+                y = house.KitchenAbvGr,
+                name = 'KitchenAbvGr',
+                marker = dict(color = 'rgba(12,50,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace3 = go.Box(
+                y = house.TotRmsAbvGrd,
+                name = 'TotRmsAbvGrd',
+                marker = dict(color = 'rgba(255,50,156,0.4)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace4 = go.Box(
+                y = house.Fireplaces,
+                name = 'Fireplaces',
+                marker = dict(color = 'rgba(230,80,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace5 = go.Box(
+                y = house.GarageCars,
+                name = 'GarageCars',
+                marker = dict(color = 'rgba(110,10,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace6 = go.Box(
+                y = house.GarageArea,
+                name = 'GarageArea',
+                marker = dict(color = 'rgba(110,10,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace7 = go.Box(
+                y = house.WoodDeckSF,
+                name = 'WoodDeckSF',
+                marker = dict(color = 'rgba(110,10,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace8 = go.Box(
+                y = house.OpenPorchSF,
+                name = 'OpenPorchSF',
+                marker = dict(color = 'rgba(110,10,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+
+data = [trace1,trace2,trace3, trace4,trace5,trace6,trace7,trace8]
+iplot(data) 
+
+##########################################################
+# Create boxplot4
+#EnclosedPorch,3SsnPorch,ScreenPorch,PoolArea,MiscVal,MoSold,YrSold,LotFrontage,MasVnrArea,GarageYrBlt사용
+trace1 = go.Box(
+                y = house.EnclosedPorch,
+                name = 'EnclosedPorch',
+                marker = dict(color = 'rgba(255,174,255,0.5)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+#trace2 = go.Box(
+#                y = house.3SsnPorch,
+#                name = '3SsnPorch',
+#                marker = dict(color = 'rgba(12,50,196,0.6)',
+#                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+#                text = house.SalePrice)
+
+trace3 = go.Box(
+                y = house.ScreenPorch,
+                name = 'ScreenPorch',
+                marker = dict(color = 'rgba(255,50,156,0.4)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace4 = go.Box(
+                y = house.PoolArea,
+                name = 'PoolArea',
+                marker = dict(color = 'rgba(230,80,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace5 = go.Box(
+                y = house.MiscVal,
+                name = 'MiscVal',
+                marker = dict(color = 'rgba(110,10,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace6 = go.Box(
+                y = house.MoSold,
+                name = 'MoSold',
+                marker = dict(color = 'rgba(110,10,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace7 = go.Box(
+                y = house.YrSold,
+                name = 'YrSold',
+                marker = dict(color = 'rgba(110,10,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace8 = go.Box(
+                y = house.LotFrontage,
+                name = 'LotFrontage',
+                marker = dict(color = 'rgba(110,10,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace9 = go.Box(
+                y = house.MasVnrArea,
+                name = 'MasVnrArea',
+                marker = dict(color = 'rgba(110,10,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+trace10 = go.Box(
+                y = house.GarageYrBlt,
+                name = 'GarageYrBlt',
+                marker = dict(color = 'rgba(110,10,196,0.6)',
+                             line = dict(color='rgb(0,0,0)',width= 1.5)),
+                text = house.SalePrice)
+
+data = [trace1,trace3, trace4,trace5,trace6,trace7,trace8,trace9,trace10]
+iplot(data) 
+
+##########################################################
+#이상치 제거
+print("old : {}".format(len(house))) 
+
+house = house[(house['LotArea']>=2500)& (house['LotArea']<=18386)]
+house = house[(house['BsmtFinSF1']<=2096)]
+house = house[(house['TotalBsmtSF']<=2330)]
+house = house[(house['GrLivArea']<=2828)] 
+house = house[(house['GarageArea']<=1025)]
+house = house[(house['WoodDeckSF']<=474)]
+house = house[(house['OpenPorchSF']<=195)] 
+house = house[(house['LotFrontage']<=124)]
+house = house[(house['MasVnrArea']<=640)] 
+
+print("new : {}".format(len(house)))
+
+##########################################################
+
+#2.train set,test set 분리
+
+X=house.iloc[:,[1,3,4,16,17,18,19,25,33,35,36,37,42,43,44,45,46,47,48,49,50,51,53,55,58,60,61,65,66,67,68,69,70,71,72,73]]
+y=house.iloc[:,76:77]
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42) 
+
+print(X.head())
+print(y.head())
+
+##########################################################
+print("X_train.shape:{}".format(X_train.shape))
+print("X_test.shape:{}".format(X_test.shape))
+print("y_train.shape:{}".format(y_train.shape))
+print("y_test.shape:{}".format(y_test.shape)) 
+
+##########################################################
+X_train.dtypes
+
+##########################################################
+
+#scaling 4가지 시도
+# scale(x) : 기본 스케일, 평균과 표준편차 사용
+from sklearn.preprocessing import StandardScaler
+
+scaler1 = StandardScaler()
+X_train1=scaler1.fit(X_train)
+X_train1=scaler1.transform(X_train)
+X_test1=scaler1.transform(X_test) 
+
+# robust_scale(x) : 중앙값과 IQR 사용, 아웃라이어의 영향을 최소화
+from sklearn.preprocessing import RobustScaler
+
+scaler2 = RobustScaler()
+X_train2=scaler2.fit(X_train)
+X_train2=scaler2.transform(X_train)
+X_test2=scaler2.transform(X_test)
+
+# minmax_scale(x) : 최대/최소값이 각각 1,0이 되도록 스케일링
+from sklearn.preprocessing import MinMaxScaler
+scaler3=MinMaxScaler()
+X_train3=scaler3.fit(X_train)
+X_train3=scaler3.transform(X_train)
+X_test3=scaler3.transform(X_test)
+
+# maxabs_scale(x) : 최대절대값과 0이 각각 1,0이 되도록 스케일링
+from sklearn.preprocessing import MaxAbsScaler
+scaler4=MaxAbsScaler()
+X_train4=scaler4.fit(X_train)
+X_train4=scaler4.transform(X_train)
+X_test4=scaler4.transform(X_test)
+
+print("X_train1 :\n", X_train1)
+print()
+print("X_train2 :\n", X_train2)
+print()
+print("X_train3 :\n",X_train3) 
+print()
+print("X_train4 :\n",X_train4)
+print()
+print()
+print("X_test1 :\n", X_test1)
+print()
+print("X_test2 :\n", X_test2)
+print()
+print("X_test3 :\n",X_test3) 
+print()
+print("X_test4 :\n",X_test4) 
+
+##########################################################
+#3.그 동안 배웠던 회귀 모델 6가지 최적의 정확도 구해보신후 비교해 보세요
+#(OLS, Ridge regression, Lasso Regression, Decision Tree, Random Forest, Gradient Boosting)
+
+#3-1.OLS 
+from sklearn.linear_model import LinearRegression
+
+lr1 = LinearRegression().fit(X_train1,y_train) 
+lr2 = LinearRegression().fit(X_train2,y_train) 
+lr3 = LinearRegression().fit(X_train3,y_train) 
+lr4 = LinearRegression().fit(X_train4,y_train) 
+
+print("OLS_train_score1 : {}".format(lr1.score(X_train1,y_train)))
+print("OLS_test_score1 : {}".format(lr1.score(X_test1,y_test))) 
+print()
+print("OLS_train_score2 : {}".format(lr2.score(X_train2,y_train)))
+print("OLS_test_score2 : {}".format(lr2.score(X_test2,y_test)))
+print()
+print("OLS_train_score3 : {}".format(lr3.score(X_train3,y_train)))
+print("OLS_test_score3 : {}".format(lr3.score(X_test3,y_test)))
+print()
+print("OLS_train_score4 : {}".format(lr4.score(X_train4,y_train)))
+print("OLS_test_score4 : {}".format(lr4.score(X_test4,y_test)))
+
+##########################################################
+
+#3-2.Ridge regression
+from sklearn.linear_model import Ridge
+
+ridge1=Ridge().fit(X_train1,y_train)
+ridge2=Ridge().fit(X_train2,y_train)
+ridge3=Ridge().fit(X_train3,y_train)
+ridge4=Ridge().fit(X_train4,y_train)
+
+print("Ridge_train_score1 : {}".format(ridge1.score(X_train1,y_train)))
+print("Ridge_test_score1 : {}".format(ridge1.score(X_test1,y_test))) 
+print()
+print("Ridge_train_score2 : {}".format(ridge2.score(X_train2,y_train)))
+print("Ridge_test_score2 : {}".format(ridge2.score(X_test2,y_test)))
+print()
+print("Ridge_train_score3 : {}".format(ridge3.score(X_train3,y_train)))
+print("Ridge_test_score3 : {}".format(ridge3.score(X_test3,y_test)))
+print()
+print("Ridge_train_score4 : {}".format(ridge4.score(X_train4,y_train)))
+print("Ridge_test_score4 : {}".format(ridge4.score(X_test4,y_test)))
+print()
+print()
+
+##########################################################
+
+#test data 적용 -> 집값 산출 -> csv파일로 저장
+test=pd.read_csv('C:/test.csv')
+test.describe()
+
+##########################################################
+test.shape
+
+##########################################################
+X=test.iloc[:,[0,1,3,4,17,18,19,20,26,34,36,37,38,43,44,45,46,47,48,49,50,51,52,54,56,59,61,62,66,67,68,69,70,71,75,76,77]]
+X2=test.iloc[:,[1,3,4,17,18,19,20,26,34,36,37,38,43,44,45,46,47,48,49,50,51,52,54,56,59,61,62,66,67,68,69,70,71,75,76,77]]
+print(X)
+
+print(X.isnull().sum())
+
+##########################################################
+
+print("old : {}".format(len(X)))
+    
+X=X[-(X['LotFrontage'].isnull())& 
+    -(X['MasVnrArea'].isnull())&
+    -(X['BsmtFinSF1'].isnull())&
+    -(X['BsmtFinSF2'].isnull())&
+    -(X['BsmtUnfSF'].isnull())&
+    -(X['TotalBsmtSF'].isnull())& 
+    -(X['BsmtFullBath'].isnull())&
+    -(X['BsmtHalfBath'].isnull())& 
+    -(X['GarageYrBlt'].isnull())&
+    -(X['GarageCars'].isnull())&
+    -(X['GarageArea'].isnull())]
+
+print("new : {}".format(len(X)))
+
+print(X.head()) 
+
+print("old2 : {}".format(len(X2)))
+
+X2=X2[-(X2['LotFrontage'].isnull())& 
+      -(X2['MasVnrArea'].isnull())&
+      -(X2['BsmtFinSF1'].isnull())&
+      -(X2['BsmtFinSF2'].isnull())&
+      -(X2['BsmtUnfSF'].isnull())&
+      -(X2['TotalBsmtSF'].isnull())& 
+      -(X2['BsmtFullBath'].isnull())&
+      -(X2['BsmtHalfBath'].isnull())& 
+      -(X2['GarageYrBlt'].isnull())&
+      -(X2['GarageCars'].isnull())&
+      -(X2['GarageArea'].isnull())]
+
+print("new2 : {}".format(len(X2)))
+
+print(X2.head()) 
+
+##########################################################
+
+y_pred=ridge4.predict(X2)
+print(y_pred)
+
+a=X.iloc[:,0:1]
+print(a) 
+
+b=np.concatenate([a,y_pred],axis=1) 
+
+##########################################################
+
+b = pd.DataFrame(b) 
+b.names=['ID','Predict']
+b.info()
+b.to_csv("C:/house_pred.csv")
+
+##########################################################
+
+#3-3.Lasso Regression
+from sklearn.linear_model import Lasso
+
+lasso1=Lasso().fit(X_train1,y_train)
+lasso2=Lasso().fit(X_train2,y_train)
+lasso3=Lasso().fit(X_train3,y_train)
+lasso4=Lasso().fit(X_train4,y_train)
+
+print("Lasso_train_score1 : {}".format(lasso1.score(X_train1,y_train)))
+print("Lasso_test_score1 : {}".format(lasso1.score(X_test1,y_test))) 
+print()
+print("Lasso_train_score2 : {}".format(lasso2.score(X_train2,y_train)))
+print("Lasso_test_score2 : {}".format(lasso2.score(X_test2,y_test)))
+print()
+print("Lasso_train_score3 : {}".format(lasso3.score(X_train3,y_train)))
+print("Lasso_test_score3 : {}".format(lasso3.score(X_test3,y_test)))
+print()
+print("Lasso_train_score4 : {}".format(lasso4.score(X_train4,y_train)))
+print("Lasso_test_score4 : {}".format(lasso4.score(X_test4,y_test)))
+
+##########################################################
+
+#3-4.Decision Tree
+from sklearn.tree import DecisionTreeClassifier
+
+tree=DecisionTreeClassifier(random_state=42)
+tree.fit(X_train,y_train)
+
+print("DecisionTree_train_score : {}".format(tree.score(X_train,y_train)))
+print("DecisionTree_test_score : {}".format(tree.score(X_test,y_test))) 
+
+##########################################################
+
+#3-4-1.Decision Tree(나무의 깊이 4로)
+from sklearn.tree import DecisionTreeClassifier
+
+tree=DecisionTreeClassifier(max_depth=4,random_state=42)
+tree.fit(X_train,y_train)
+
+print("DecisionTree_train_score : {}".format(tree.score(X_train,y_train)))
+print("DecisionTree_test_score : {}".format(tree.score(X_test,y_test))) 
+
+##########################################################
+
+#3-5.Random Forest
+from sklearn.ensemble import RandomForestClassifier
+
+forest=RandomForestClassifier(n_estimators=5, random_state=2) # 만들 나무 개수 : 5
+forest.fit(X_train,y_train)
+
+print("train accuracy : {}".format(forest.score(X_train,y_train)))
+print("test accuracy : {}".format(forest.score(X_test,y_test))) 
+
+##########################################################
+
+#3-6.Gradient Boosting
+from sklearn.ensemble import GradientBoostingClassifier
+
+gbrt = GradientBoostingClassifier(random_state=2)
+gbrt.fit(X_train,y_train)
+
+print("train accuracy : {}".format(gbrt.score(X_train,y_train)))
+print("test accuracy : {}".format(gbrt.score(X_test,y_test))) 
+
+
+
+
+
+
+
+
+
